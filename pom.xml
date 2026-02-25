@@ -7,10 +7,6 @@
     <groupId>com.example</groupId>
     <artifactId>Diplom2</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>Diplom2</name>
-    <url>https://maven.apache.org</url>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -18,15 +14,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <allure.version>2.29.0</allure.version>
         <junit.version>4.13.2</junit.version>
-        <rest-assured.version>5.5.0</rest-assured.version>
+        <rest-assured.version>5.3.0</rest-assured.version>
         <aspectj.version>1.9.19</aspectj.version>
-        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.24</lombok.version>
         <jackson.version>2.15.2</jackson.version>
+        <httpclient.version>4.5.13</httpclient.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
     </properties>
 
     <dependencies>
-        <!-- JUnit 4 -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -34,7 +31,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- REST Assured -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
@@ -42,7 +38,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Allure JUnit 4 -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit4</artifactId>
@@ -50,7 +45,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Allure REST Assured -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-rest-assured</artifactId>
@@ -58,15 +52,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- AspectJ Weaver (важно для Allure) -->
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>${aspectj.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -74,31 +59,48 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Jackson для JSON (лучше чем Gson) -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Apache Commons Lang (оставим для генерации данных) -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.14.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Компилятор с поддержкой Lombok -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>11</source>
                     <target>11</target>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <fork>true</fork>
+                    <compilerArgs>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                    </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -109,13 +111,12 @@
                 </configuration>
             </plugin>
 
-            <!-- Surefire для запуска тестов -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <testFailureIgnore>true</testFailureIgnore> <!-- Игнорируем падающие тесты -->
+                    <testFailureIgnore>true</testFailureIgnore>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                         -Dallure.results.directory=${project.build.directory}/allure-results
@@ -142,7 +143,6 @@
                 </dependencies>
             </plugin>
 
-            <!-- Allure отчеты -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
