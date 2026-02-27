@@ -30,4 +30,23 @@ public class OrderClient extends BaseApiTest {
                 .post(ORDERS_PATH)
                 .then();
     }
+
+    @Step("Получение заказов пользователя")
+    public ValidatableResponse getUserOrders(String accessToken) {
+        return given()
+                .spec(getBaseSpec())
+                .header("Authorization", accessToken)
+                .when()
+                .get(ORDERS_PATH)
+                .then();
+    }
+
+    @Step("Получение заказов без авторизации")
+    public ValidatableResponse getUserOrders() {
+        return given()
+                .spec(getBaseSpec())
+                .when()
+                .get(ORDERS_PATH)
+                .then();
+    }
 }
